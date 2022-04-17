@@ -13,7 +13,7 @@ library(testit) # Validation
 
 # Set up working directory 
 working_directory <- "/Users/eyobmanhardt/desktop/data_analytics/google_capstone_project_R/data/raw"
-setwd(working_directoryr)
+setwd(working_directory)
 
 # Helper function to track files 
 extract_name <- function(str_csv_file){
@@ -58,8 +58,39 @@ upper_bound <- quantile(chicago_bike_trip[, duration], 0.75) + 1.5*iqr
 chicago_bike_trip <- chicago_bike_trip[duration %between% c(lower_bound, upper_bound),]
 
 # Remove invalid values: ids with 30 + characters 
-chicago_bike_trip <- chicago_bike_trip[str_length(start_station_id) <= 30 | 
-                                                     str_length(end_station_id) <= 30]
+chicago_bike_trip <- chicago_bike_trip[str_length(start_station_id) < 30] %>% 
+  .[str_length(end_station_id) < 30]
+
 # Remove invalid values: ids and station names with empty entries 
 chicago_bike_trip <- chicago_bike_trip[str_length(start_station_name) > 0 &  str_length(start_station_id) > 0] %>% 
   .[str_length(end_station_name) > 0 & str_length(end_station_id) > 0]
+
+
+###############################################################################################
+# Removed inconsistent and NA values in dataset.
+# Identified and corrected inconsistent data objects.
+# Created a new atrribute; duration, to compuate the ride length for each trip.
+# Verfied each (numerical) field to within a reasonabel range.
+# Before saving proccessed data - validate changes and verify data is ready to analyze 
+###############################################################################################
+
+# Safety measures: validate data 
+
+# Datatype
+assert("check started_a is datetime ", c("POSIXct" ,"POSIXt" ) == class(chicago_bike_trip[,started_at]))
+assert("check ended_at is datetime ", c("POSIXct" ,"POSIXt" ) == class(chicago_bike_trip[,ended_at]))
+
+# Range Constraint
+assert("Check duration values are valid", sum(chicago_bike_trip[, duration] %between% c(lower_bound, upper_bound)) == nrow(chicago_bike_trip))
+assert("Check start_station_id is less than 30 charcters long", max(str_length(chicago_bike_trip[, start_station_id])) < 30)
+assert("Check end_station_id is less than 30 charcters long", max(str_length(chicago_bike_trip[, end_station_id])) < 30)
+assert("Check start_station_name is not an empty string", min(str_length(chicago_bike_trip[, start_station_name])) > 0)
+assert("Check end_station_name is not an empty string", min(str_length(chicago_bike_trip[, end_station_name])) > 0)
+
+# No missing values
+assert("Check the sum of missing values is 0", sum(apply(X = is.na(chicago_bike_trip), MARGIN = 2, sum)) == 0)
+
+# Save clean data
+path_out = '/Users/eyobmanhardt/desktop/data_analytics/google_capstone_project_R/data/processed/'
+file_name = paste(path_out, 'chicago_bike_trip_clean.csv',sep = '')
+fwrite(chicago_bike_trip, file_name)

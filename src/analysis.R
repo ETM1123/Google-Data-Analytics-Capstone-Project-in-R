@@ -1,5 +1,5 @@
 ###############################################################################################
-# This script attempts analyze 2020-2021 bikeshare data from the chicago region 
+# This script analyze 2020-2021 bikeshare data from the chicago region 
 # in attempt to answer the following question: 
 # How do annual members and casual riders use Cyclistic bikes differently?
 ################################################################################################
@@ -220,4 +220,116 @@ modified_dataset %>% select(day_of_week, membership_status, ride_length) %>%
 ## Annual members use classic bikes signifcanlty more than any other bike type
 
 # Next: Identify popular stations and other hot spots or unique stations
+################################################################################################
+
+# Identify top 10 most popular start stations for 2020
+modified_dataset %>% 
+  select(start_station_name, year) %>% 
+  group_by(start_station_name, year) %>% 
+  summarise(count = n()) %>%
+  filter(year == "2020") %>% 
+  arrange(desc(count)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(start_station_name, -count), y = count)) +
+  geom_bar(stat = "identity") + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ggtitle("2020 Most popular Departing station") +
+  xlab("Start Station Name")
+
+# Identify top 10 most popular end stations for 2020
+modified_dataset %>% 
+  select(end_station_name, year) %>% 
+  group_by(end_station_name, year) %>% 
+  summarise(count = n()) %>%
+  filter(year == "2020") %>% 
+  arrange(desc(count)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(end_station_name, -count), y = count)) +
+  geom_bar(stat = "identity") + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ggtitle("2020 Most popular Destination") +
+  xlab("End Station Name")
+
+# Identify top 10 most popular start stations for 2021
+modified_dataset %>% 
+  select(start_station_name, year) %>% 
+  group_by(start_station_name, year) %>% 
+  summarise(count = n()) %>%
+  filter(year == "2021") %>% 
+  arrange(desc(count)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(start_station_name, -count), y = count)) +
+  geom_bar(stat = "identity") + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ggtitle("2021 Most popular Departing station") +
+  xlab("Start Station Name")
+
+# Identify top 10 most popular end stations for 2021
+modified_dataset %>% 
+  select(end_station_name, year) %>% 
+  group_by(end_station_name, year) %>% 
+  summarise(count = n()) %>%
+  filter(year == "2021") %>% 
+  arrange(desc(count)) %>% 
+  head(10) %>% 
+  ggplot(aes(x = reorder(end_station_name, -count), y = count)) +
+  geom_bar(stat = "identity") + 
+  scale_x_discrete(guide = guide_axis(angle = 45)) +
+  ggtitle("2021 Most popular Destination") +
+  xlab("End Station Name")
+
+# Most popular route (start --> destination) for 2020
+modified_dataset %>% select(start_station_name, end_station_name, year) %>% 
+  group_by(start_station_name, end_station_name, year) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  filter(year == "2020") %>% 
+  head(10)
+
+# Most popular route (start --> destination) for 2021
+modified_dataset %>% select(start_station_name, end_station_name, year) %>% 
+  group_by(start_station_name, end_station_name, year) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  filter(year == "2021") %>% 
+  head(10)
+
+## many of the users start and end at the same station.
+
+# Most popular route (start --> destination) where start != end
+
+# Year = 2020
+modified_dataset %>% select(start_station_name, end_station_name, year) %>% 
+  group_by(start_station_name, end_station_name, year) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  filter(year == "2020", start_station_name != end_station_name) %>% 
+  head(10)
+
+# Year 2021
+modified_dataset %>% select(start_station_name, end_station_name, year) %>% 
+  group_by(start_station_name, end_station_name, year) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count)) %>% 
+  filter(year == "2021", start_station_name != end_station_name) %>% 
+  head(10)
+
+
+###############################################################################################
+# Observation 
+
+## Top three departing start statin for 2020: Clark St & Elm St, Streeter Dr & Grand Ave, Theater on The Lake
+## Top three departing start statin for 2021: Streeter Dr & Grand Ave, Wells St & Concord Ln, Clark St & Elm St
+
+## Top three destination station for 2020: Clark St & Elm St, Streeter Dr & Grand Ave, Theater on The Lake
+## Top three destination station for 2021: Streeter Dr & Grand Ave, Wells St & Concord Ln, Clark St & Elm St
+
+## Most frequent route for each member consist of the same station (both year)
+
+## Most frequent route where start station does not equal end station
+### 2020: Lake Shore Dr & Monroe St --> Streeter Dr & Grand Ave
+### 2021: Ellis Ave & 60th St --> Ellis Ave & 55th St
+
+# Next:
+## Identify if thers's particular stations or route that's specifcally taken by a member type
 ################################################################################################

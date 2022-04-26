@@ -333,3 +333,71 @@ modified_dataset %>% select(start_station_name, end_station_name, year) %>%
 # Next:
 ## Identify if thers's particular stations or route that's specifcally taken by a member type
 ################################################################################################
+
+
+# Most frequent start station ussage by different member types
+popular_routes <- modified_dataset %>% 
+  select(start_station_name, end_station_name, membership_status, year) %>% 
+  group_by(start_station_name, end_station_name, membership_status, year) %>% 
+  summarise(count = n()) %>% 
+  as.data.frame() %>% 
+  filter(start_station_name != end_station_name) %>% 
+  mutate(route = paste(start_station_name, end_station_name, sep=" --> ")) %>% 
+  select(-start_station_name, -end_station_name) %>% 
+  arrange(desc(count))
+head(popular_routes)
+
+# select top three routes for each group
+top_three_routes <- popular_routes %>% 
+  group_by(membership_status, year) %>% 
+  arrange(desc(count), .by_group = TRUE) %>% 
+  top_n(count, n= 3)
+
+# Plot the top routes for casual members
+top_three_routes %>% 
+  filter(membership_status == "casual") %>% 
+  ggplot(aes(x = reorder(route, -count), y = count)) +
+  geom_bar(stat ="identity") +
+  facet_wrap(~year, scales = "free") +
+  ggtitle("Most frequent route for Casual Members") + 
+  scale_x_discrete(guide = guide_axis(angle = 70)) +
+  xlab("Route")
+
+# Plot the top routes for Anual mebership holders
+top_three_routes %>% 
+  filter(membership_status == "member") %>% 
+  ggplot(aes(x = reorder(route, -count), y = count)) +
+  geom_bar(stat ="identity") +
+  facet_wrap(~year, scales = "free") +
+  ggtitle("Most frequent route for Annual Membership holders") + 
+  scale_x_discrete(guide = guide_axis(angle = 70)) +
+  xlab("Route")
+
+###############################################################################################
+# Observation 
+
+## Top three most frequent routes for annual mebers
+### 2020:
+#### MLK Jr Dr & 29th St --> State St & 33rd St
+#### State St & 33rd St --> MLK Jr Dr & 29th St
+#### Lakefront Trail & Bryn Mawr Ave --> Theater on the Lake
+
+### 2021:
+#### Ellis Ave & 60th St --> Ellis Ave & 55th St
+#### Ellis Ave & 55th St --> Ellis Ave & 60th St
+#### Ellis Ave & 60th St --> University Ave & 57th St
+
+## Top three most frequent routes for causal mebers
+### 2020:
+#### Lake Shore Dr & Monroe St --> Streeter Dr & Grand Ave 
+#### Streeter Dr & Grand Ave --> Millennium Park
+#### Millennium Park --> Streeter Dr & Grand Ave
+
+### 2021:
+#### Streeter Dr & Grand Ave --> Millennium Park
+#### Lake Shore Dr & Monroe St --> Streeter Dr & Grand Ave
+#### DuSable Lake Shore Dr & Monroe St --> Streeter Dr & Grand Ave
+
+# Next:
+## Investigte most frequent route for each month
+################################################################################################

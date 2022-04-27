@@ -1,0 +1,25 @@
+---
+title: 'Google Data Anlaytics Project: Bikeshare Analysis'
+author: "Eyob Tadele-Manhardt"
+date: "4/27/2022"
+output: html_document
+---
+
+# Introduction
+## Overview 
+### Sumaary of the cleaning procdure
+## Objectives
+## Dataset
+
+# Descriptive Analysis
+
+# Guiding Questions
+## Question 1:
+## Question 2:
+## Question 3:
+## Question 4:
+
+# Conslusion
+## Summary
+## Recommendations 
+## Next Steps

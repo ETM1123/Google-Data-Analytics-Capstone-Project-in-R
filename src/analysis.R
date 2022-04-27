@@ -444,3 +444,21 @@ top_routes_by_month %>%
 ##  From 2020 - 2021 there's a signifcan increasse of activity Ellis Ave & 60th St station
 
 ################################################################################################
+
+## Add this to the cleaning section
+### currently min(ride_length) = 0 which doesn't make much sense
+summary(modified_dataset$ride_length)
+quantile(modified_dataset$ride_length)
+
+## Update ride_length min to the first quantile
+q1 <- quantile(modified_dataset$ride_length, probs = 0.25)
+five_min <- 5
+
+ride_length_min <- ifelse(q1 > five_min, five_min, q1)
+rm(q1, five_min)
+
+updated_modifed_dataset <- subset(modified_dataset, ride_length >= ride_length_min)
+
+# Save modifed data 
+file_name = paste(working_directory, 'chicago_bike_trip_clean_02.csv',sep = '/')
+write_csv2(updated_modifed_dataset, file = file_name, col_names = TRUE)

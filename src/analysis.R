@@ -401,3 +401,46 @@ top_three_routes %>%
 # Next:
 ## Investigte most frequent route for each month
 ################################################################################################
+
+top_routes_by_month <- modified_dataset %>% 
+  select(start_station_name, end_station_name, membership_status, year, month) %>% 
+  filter(start_station_name != end_station_name) %>% 
+  mutate(route = paste(start_station_name, end_station_name, sep=" --> ")) %>% 
+  select(-start_station_name, -end_station_name) %>% 
+  group_by(route, membership_status, month, year) %>% 
+  summarise(count = n()) %>% 
+  as.data.frame() %>% 
+  group_by(membership_status, month, year) %>% 
+  arrange(desc(count), .by_groups = TRUE) %>% 
+  top_n(count, n = 1)
+top_routes_by_month
+
+# sanity check: 12 months - 2 membership status, 2 years of data ==> at most 48 observation
+## causal member
+top_routes_by_month %>% 
+  filter(year == "2020", membership_status =="casual") %>% 
+  arrange(month)
+
+top_routes_by_month %>% 
+  filter(year == "2021", membership_status =="casual") %>% 
+  arrange(month)
+
+## annual member
+top_routes_by_month %>% 
+  filter(year == "2020", membership_status =="member") %>% 
+  arrange(month)
+
+top_routes_by_month %>% 
+  filter(year == "2021", membership_status =="member") %>% 
+  arrange(month)
+
+###############################################################################################
+# Observation 
+
+# Causal members
+## Most frequent route for each month: Lake Shore Dr & Monroe St --> Streeter Dr & Grand Ave
+
+## Annual members 
+##  From 2020 - 2021 there's a signifcan increasse of activity Ellis Ave & 60th St station
+
+################################################################################################
